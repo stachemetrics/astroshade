@@ -36,6 +36,8 @@ footer { display: none !important; }
 button { min-height: 48px !important; font-size: 1rem !important; }
 input, textarea { font-size: 16px !important; }
 .image-container { width: 100% !important; }
+#status-bar { text-align: center; padding: 1rem; font-size: 1.1rem; color: #666; animation: pulse 1.5s ease-in-out infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 """
 
 # Default client description from Case 1
@@ -69,7 +71,7 @@ def _format_formulation_md(formulation: HairFormulation) -> str:
 
     if formulation.warnings:
         lines.append("---")
-        lines.append("### Warnings")
+        lines.append("### ⚠️ Warnings")
         lines.append(f"**{formulation.warnings}**")
         lines.append("")
 
@@ -107,7 +109,7 @@ def _save_session(
 ):
     """Persist session JSON and images (if consent given) to log_dir."""
     if not log_dir:
-        return
+        return None
 
     session_id = str(uuid.uuid4())
     session = {
@@ -125,7 +127,8 @@ def _save_session(
 
     sessions_dir = os.path.join(log_dir, "sessions")
     os.makedirs(sessions_dir, exist_ok=True)
-    with open(os.path.join(sessions_dir, f"{session_id}.json"), "w") as f:
+    session_path = os.path.join(sessions_dir, f"{session_id}.json")
+    with open(session_path, "w") as f:
         json.dump(session, f, indent=2)
 
     # Save images if consent given
@@ -144,6 +147,8 @@ def _save_session(
             except Exception:
                 pass
 
+    return session_id
+
 
 # ---------------------------------------------------------------------------
 # Callback functions
@@ -153,7 +158,7 @@ def _on_analyse_desired(client_desc, ref_image_path):
     """Step 1 submit: analyse the desired look."""
     if not client_desc.strip():
         gr.Warning("Please describe the desired look.")
-        return [gr.update()] * 5  # no changes
+        return [gr.update()] * 5
 
     image_bytes = _read_image(ref_image_path)
     try:
@@ -242,10 +247,10 @@ def _on_confirm_starting(
 
     return [
         state,
-        gr.update(visible=False),  # hide step 3-4
-        gr.update(visible=True),   # show step 5
+        gr.update(visible=False),                      # hide step 3-4
+        gr.update(visible=True),                       # show step 5
         preview_img,
-        fallback_text,
+        gr.update(value=fallback_text, visible=bool(fallback_text)),  # only show if there's fallback text
     ]
 
 
@@ -260,7 +265,7 @@ def _on_preview_retry(state):
     if preview_img is None:
         fallback_text = "Preview generation unavailable. Proceeding with formulation."
     state["preview_image"] = preview_img
-    return [state, preview_img, fallback_text]
+    return [state, preview_img, gr.update(value=fallback_text, visible=bool(fallback_text))]
 
 
 def _on_preview_accept(state):
@@ -292,30 +297,21 @@ def _on_change_desired(state):
     ]
 
 
-def _on_submit_rating(rating, feedback_notes, state):
-    """Step 6 submit: store rating and show step 7."""
+def _on_submit_rating(rating, feedback_notes, email, state, log_dir_state):
+    """Step 6 submit: store rating, email, save session, show thank-you."""
     state["rating"] = rating
     state["stylist_notes"] = feedback_notes
-    return [
-        state,
-        gr.update(visible=False),  # hide step 6
-        gr.update(visible=True),   # show step 7
-    ]
-
-
-def _on_submit_email(email, state, log_dir_state):
-    """Step 7 submit: save session and show thank-you."""
-    state["email"] = email
+    state["email"] = email or ""
     log_dir = log_dir_state
 
-    _save_session(
+    session_id = _save_session(
         log_dir=log_dir,
         desired=state.get("desired", {}),
         starting=state.get("starting", {}),
         preview_generated=state.get("preview_image") is not None,
         formulation=state.get("formulation", {}),
-        rating=state.get("rating"),
-        stylist_notes=state.get("stylist_notes", ""),
+        rating=rating,
+        stylist_notes=feedback_notes or "",
         email=email or "",
         consent=state.get("consent", False),
         desired_image_path=state.get("desired_image_path"),
@@ -323,10 +319,13 @@ def _on_submit_email(email, state, log_dir_state):
         preview_image=state.get("preview_image"),
     )
 
+    saved_msg = f"Session saved (ID: {session_id})." if session_id else "Session complete."
+
     return [
         state,
-        gr.update(visible=False),  # hide step 7 form
+        gr.update(visible=False),  # hide step 6
         gr.update(visible=True),   # show thank-you
+        f"## Thank you!\n\n{saved_msg}\n\nWe appreciate your feedback.",
     ]
 
 
@@ -343,7 +342,7 @@ def create_demo(log_dir: str = None) -> gr.Blocks:
         session_state = gr.State(value={})
         log_dir_state = gr.State(value=log_dir)
 
-        gr.Markdown("# Astroshade\n**AI Hair Colour Consultation**")
+        gr.Markdown("# ✂️ Astroshade\n**AI Hair Colour Consultation**")
 
         # ==================================================================
         # Steps 1-2: Desired Look
@@ -361,6 +360,7 @@ def create_demo(log_dir: str = None) -> gr.Blocks:
                 sources=["upload", "webcam"],
             )
             analyse_desired_btn = gr.Button("Analyse desired look", variant="primary")
+            status_desired = gr.Markdown("", visible=False, elem_id="status-bar")
 
             with gr.Column(visible=False) as desired_results_col:
                 gr.Markdown("### AI Analysis — edit if needed")
@@ -386,6 +386,7 @@ def create_demo(log_dir: str = None) -> gr.Blocks:
                 value=False,
             )
             analyse_starting_btn = gr.Button("Analyse current hair", variant="primary")
+            status_starting = gr.Markdown("", visible=False, elem_id="status-bar")
 
             with gr.Column(visible=False) as starting_results_col:
                 gr.Markdown("### AI Analysis — edit if needed")
@@ -395,6 +396,7 @@ def create_demo(log_dir: str = None) -> gr.Blocks:
                 s_previous = gr.Textbox(label="Previous colour")
                 s_grey = gr.Number(label="Grey %", precision=0)
                 confirm_starting_btn = gr.Button("Confirm & generate preview", variant="primary")
+                status_preview = gr.Markdown("", visible=False, elem_id="status-bar")
 
         # ==================================================================
         # Step 5: Preview
@@ -405,7 +407,7 @@ def create_demo(log_dir: str = None) -> gr.Blocks:
             preview_fallback = gr.Textbox(
                 label="",
                 interactive=False,
-                visible=True,
+                visible=False,  # hidden by default, shown only when preview fails
             )
             gr.Markdown(
                 "*This is an approximation only. Your actual results may vary.*"
@@ -414,13 +416,15 @@ def create_demo(log_dir: str = None) -> gr.Blocks:
                 preview_accept_btn = gr.Button("Looks good — get formulation", variant="primary")
                 preview_retry_btn = gr.Button("Try again")
             change_desired_btn = gr.Button("Change desired look", variant="secondary")
+            status_formulation = gr.Markdown("", visible=False, elem_id="status-bar")
 
         # ==================================================================
-        # Step 6: Formulation + Rating
+        # Step 6: Formulation + Rating + Email (combined)
         # ==================================================================
         with gr.Column(visible=False) as step6_col:
             gr.Markdown("## Formulation")
             formulation_md = gr.Markdown("")
+
             gr.Markdown("---")
             gr.Markdown("### Rate this recommendation")
             rating_radio = gr.Radio(
@@ -428,34 +432,47 @@ def create_demo(log_dir: str = None) -> gr.Blocks:
                 label="How was this formulation?",
             )
             feedback_notes = gr.Textbox(label="Feedback / notes (optional)", lines=2)
-            submit_rating_btn = gr.Button("Submit rating", variant="primary")
+
+            gr.Markdown("---")
+            gr.Markdown("### Stay in the loop")
+            email_input = gr.Textbox(
+                label="Email — would you like to hear about product updates? (optional)",
+            )
+            submit_rating_btn = gr.Button("Submit & finish", variant="primary")
 
         # ==================================================================
-        # Step 7: CTA + Save
+        # Thank you + Reset
         # ==================================================================
-        with gr.Column(visible=False) as step7_col:
-            with gr.Column(visible=True) as step7_form:
-                gr.Markdown("## Stay in the loop")
-                gr.Markdown("Would you like to hear about product updates?")
-                email_input = gr.Textbox(label="Email (optional)")
-                submit_email_btn = gr.Button("Finish", variant="primary")
-            with gr.Column(visible=False) as step7_thanks:
-                gr.Markdown("## Thank you!")
-                gr.Markdown(
-                    "Your consultation has been saved. "
-                    "We appreciate your feedback."
-                )
-                new_consultation_btn = gr.Button("Start new consultation", variant="primary")
+        with gr.Column(visible=False) as thanks_col:
+            thanks_md = gr.Markdown("## Thank you!\n\nYour consultation has been saved.")
+            new_consultation_btn = gr.Button("Start new consultation", variant="secondary")
 
         # ==================================================================
-        # Event wiring
+        # Event wiring — with status indicator
         # ==================================================================
+
+        def _show_status(msg):
+            """Return a function that shows a status message."""
+            def _inner(*args):
+                return gr.update(value=f"**{msg}**", visible=True)
+            return _inner
+
+        def _hide_status(*args):
+            return gr.update(value="", visible=False)
 
         # Step 1: analyse desired
         analyse_desired_btn.click(
+            fn=_show_status("Analysing desired look..."),
+            inputs=None,
+            outputs=[status_desired],
+        ).then(
             fn=_on_analyse_desired,
             inputs=[client_desc, ref_image],
             outputs=[desired_results_col, d_target_level, d_tone, d_technique, d_description],
+        ).then(
+            fn=_hide_status,
+            inputs=None,
+            outputs=[status_desired],
         )
 
         # Step 2: confirm desired
@@ -467,32 +484,64 @@ def create_demo(log_dir: str = None) -> gr.Blocks:
 
         # Step 3: analyse starting
         analyse_starting_btn.click(
+            fn=_show_status("Analysing current hair..."),
+            inputs=None,
+            outputs=[status_starting],
+        ).then(
             fn=_on_analyse_starting,
             inputs=[client_photo, stylist_notes],
             outputs=[starting_results_col, s_current_level, s_description, s_condition, s_previous, s_grey],
+        ).then(
+            fn=_hide_status,
+            inputs=None,
+            outputs=[status_starting],
         )
 
         # Step 4: confirm starting + auto-trigger preview
         confirm_starting_btn.click(
+            fn=_show_status("Generating preview..."),
+            inputs=None,
+            outputs=[status_preview],
+        ).then(
             fn=_on_confirm_starting,
             inputs=[
                 s_current_level, s_description, s_condition, s_previous, s_grey,
                 consent_cb, client_photo, session_state,
             ],
             outputs=[session_state, step34_col, step5_col, preview_image, preview_fallback],
+        ).then(
+            fn=_hide_status,
+            inputs=None,
+            outputs=[status_preview],
         )
 
         # Step 5: preview actions
         preview_retry_btn.click(
+            fn=_show_status("Regenerating preview..."),
+            inputs=None,
+            outputs=[status_formulation],
+        ).then(
             fn=_on_preview_retry,
             inputs=[session_state],
             outputs=[session_state, preview_image, preview_fallback],
+        ).then(
+            fn=_hide_status,
+            inputs=None,
+            outputs=[status_formulation],
         )
 
         preview_accept_btn.click(
+            fn=_show_status("Generating formulation..."),
+            inputs=None,
+            outputs=[status_formulation],
+        ).then(
             fn=_on_preview_accept,
             inputs=[session_state],
             outputs=[session_state, step5_col, step6_col, formulation_md],
+        ).then(
+            fn=_hide_status,
+            inputs=None,
+            outputs=[status_formulation],
         )
 
         change_desired_btn.click(
@@ -501,18 +550,11 @@ def create_demo(log_dir: str = None) -> gr.Blocks:
             outputs=[step5_col, step12_col],
         )
 
-        # Step 6: submit rating
+        # Step 6: submit rating + email + save (combined)
         submit_rating_btn.click(
             fn=_on_submit_rating,
-            inputs=[rating_radio, feedback_notes, session_state],
-            outputs=[session_state, step6_col, step7_col],
-        )
-
-        # Step 7: submit email / finish
-        submit_email_btn.click(
-            fn=_on_submit_email,
-            inputs=[email_input, session_state, log_dir_state],
-            outputs=[session_state, step7_form, step7_thanks],
+            inputs=[rating_radio, feedback_notes, email_input, session_state, log_dir_state],
+            outputs=[session_state, step6_col, thanks_col, thanks_md],
         )
 
         # Reset: start new consultation
@@ -523,9 +565,7 @@ def create_demo(log_dir: str = None) -> gr.Blocks:
                 gr.update(visible=False),    # step34_col
                 gr.update(visible=False),    # step5_col
                 gr.update(visible=False),    # step6_col
-                gr.update(visible=False),    # step7_col
-                gr.update(visible=True),     # step7_form
-                gr.update(visible=False),    # step7_thanks
+                gr.update(visible=False),    # thanks_col
                 gr.update(visible=False),    # desired_results_col
                 gr.update(visible=False),    # starting_results_col
                 DEFAULT_CLIENT_DESC,         # client_desc
@@ -534,7 +574,7 @@ def create_demo(log_dir: str = None) -> gr.Blocks:
                 "",                          # stylist_notes
                 False,                       # consent_cb
                 None,                        # preview_image
-                "",                          # preview_fallback
+                gr.update(value="", visible=False),  # preview_fallback
                 "",                          # formulation_md
                 None,                        # rating_radio
                 "",                          # feedback_notes
@@ -548,6 +588,10 @@ def create_demo(log_dir: str = None) -> gr.Blocks:
                 "",                          # s_condition
                 "",                          # s_previous
                 None,                        # s_grey
+                gr.update(value="", visible=False),  # status_desired
+                gr.update(value="", visible=False),  # status_starting
+                gr.update(value="", visible=False),  # status_preview
+                gr.update(value="", visible=False),  # status_formulation
             ]
 
         new_consultation_btn.click(
@@ -555,14 +599,14 @@ def create_demo(log_dir: str = None) -> gr.Blocks:
             inputs=[],
             outputs=[
                 session_state,
-                step12_col, step34_col, step5_col, step6_col, step7_col,
-                step7_form, step7_thanks,
+                step12_col, step34_col, step5_col, step6_col, thanks_col,
                 desired_results_col, starting_results_col,
                 client_desc, ref_image, client_photo, stylist_notes, consent_cb,
                 preview_image, preview_fallback, formulation_md,
                 rating_radio, feedback_notes, email_input,
                 d_target_level, d_tone, d_technique, d_description,
                 s_current_level, s_description, s_condition, s_previous, s_grey,
+                status_desired, status_starting, status_preview, status_formulation,
             ],
         )
 
@@ -574,5 +618,12 @@ def create_demo(log_dir: str = None) -> gr.Blocks:
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    demo = create_demo()
+    from dotenv import load_dotenv
+    load_dotenv()
+
+    # Log locally to app/logs/ for testing
+    local_log_dir = os.path.join(os.path.dirname(__file__), "logs")
+    os.makedirs(local_log_dir, exist_ok=True)
+
+    demo = create_demo(log_dir=local_log_dir)
     demo.launch(server_name="0.0.0.0", server_port=7860)

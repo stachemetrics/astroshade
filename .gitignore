@@ -4,3 +4,4 @@ local/
 todo*.md
 .claude/
 */__pycache__/
+app/logs/
