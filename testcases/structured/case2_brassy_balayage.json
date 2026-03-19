@@ -1,0 +1,28 @@
+{
+  "case_id": "case2",
+  "title": "Brassy Balayage Correction — Glaze/Toning",
+  "client_description": "My balayage has gone super brassy and orange from the sun and washing. I want it cooler, creamy, and expensive-looking, but I don't want to lose my natural root.",
+  "starting_point": {
+    "level": 6,
+    "description": "Dark Blonde roots. Grown-out balayage, mids/ends faded to uneven level 8/9 with heavy gold and slight copper (orange). Slightly porous ends.",
+    "grey_percentage": 0,
+    "condition": "slightly porous ends",
+    "previous_colour": "balayage, grown out"
+  },
+  "known_good_formulation": {
+    "steps": [
+      {
+        "step": 1,
+        "name": "Toner",
+        "product": "Colorance 8BA + 9NA (1:1)",
+        "developer": "Colorance Lotion 2%",
+        "ratio": "2:1",
+        "amounts": "60ml lotion : 15ml 8BA : 15ml 9NA",
+        "processing_time_mins": 20,
+        "processing_note": "15-20 min",
+        "application": "Global on damp hair at basin, focus on brassiest transition bands first, pull through porous ends for final 5-10 min to prevent over-toning"
+      }
+    ],
+    "colour_theory": "Colorance is acidic demi-permanent — won't lift natural hair, so level 6 roots stay untouched (no hot roots). 8BA (Smoky Beige) contains Blue/Ash to neutralise orange/copper. 9NA (Natural Ash) neutralises yellow and provides natural balance so hair doesn't grab grey or muddy."
+  }
+}

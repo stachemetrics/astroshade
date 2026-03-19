@@ -1,0 +1,28 @@
+{
+  "case_id": "case3",
+  "title": "Grey Blending with Highlift — Root Retouch",
+  "client_description": "I need my roots done. I want to stay really bright blonde, cover these greys coming through, but I don't want bleach on my scalp. Keep it as cool as possible.",
+  "starting_point": {
+    "level": 7,
+    "description": "Medium Blonde with 40% scattered grey. Mids/ends previously coloured to level 10 neutral blonde. Normal at root, slightly dry on ends.",
+    "grey_percentage": 40,
+    "condition": "normal at root, slightly dry ends",
+    "previous_colour": "level 10 neutral blonde on mids/ends"
+  },
+  "known_good_formulation": {
+    "steps": [
+      {
+        "step": 1,
+        "name": "Highlift",
+        "product": "Topchic 11N + 11A (1:1)",
+        "developer": "12% (40 Vol)",
+        "ratio": "1:2",
+        "amounts": "30g 11N + 30g 11A : 120ml 12% developer",
+        "processing_time_mins": 45,
+        "processing_note": "45 min strictly — do not cut short",
+        "application": "Regrowth only, cross-check sections. Do NOT overlap onto level 10 ends (breakage risk)"
+      }
+    ],
+    "colour_theory": "Highlift requires 12% and 1:2 ratio to maximise lifting curve and minimise deposit. At level 7, underlying pigment is yellow-orange. 11A (Ash) neutralises warmth. 11N (Natural) provides background dye required to cover unpigmented hair — highlift ash alone lacks opacity for grey blending."
+  }
+}

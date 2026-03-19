@@ -1,0 +1,39 @@
+{
+  "case_id": "case1",
+  "title": "Scandi Blonde — Global Lightening & Tone",
+  "client_description": "I want to be super bright blonde all over, like an icy Scandi blonde. I hate seeing any yellow or gold.",
+  "starting_point": {
+    "level": 7,
+    "description": "Medium Blonde, virgin hair, healthy condition",
+    "grey_percentage": 0,
+    "condition": "healthy",
+    "previous_colour": "none"
+  },
+  "known_good_formulation": {
+    "steps": [
+      {
+        "step": 1,
+        "name": "Lightener",
+        "product": "SilkLift Strong",
+        "developer": "6% (20 Vol)",
+        "ratio": "1:1",
+        "amounts": "35g powder : 35ml developer",
+        "additives": "3 pumps Intensive Conditioning Serum",
+        "processing_time_mins": 45,
+        "processing_note": "Visual check until pale yellow",
+        "application": "1cm off scalp through ends first, roots once mids reach level 9"
+      },
+      {
+        "step": 2,
+        "name": "Toner",
+        "product": "Colorance 10V + 10P (1:1)",
+        "developer": "Colorance Lotion 2%",
+        "ratio": "2:1",
+        "amounts": "40ml lotion : 10ml 10V : 10ml 10P",
+        "processing_time_mins": 15,
+        "application": "Rinse lightener, shampoo, towel dry, apply toner at basin"
+      }
+    ],
+    "colour_theory": "20 vol safely lifts virgin level 7 three levels. At level 10, underlying pigment is pale yellow. V (Violet) neutralises yellow. P (Pearl, blue-violet undertone) adds icy reflective finish."
+  }
+}
