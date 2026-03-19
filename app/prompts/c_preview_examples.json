@@ -1,0 +1,80 @@
+{
+  "positive": [
+    {
+      "label": "Global lightening to icy platinum",
+      "input": {
+        "description": "Clean, icy, level 10 platinum blonde. Cool, reflective finish. No yellow or gold.",
+        "target_level": 10,
+        "tone": "violet/pearl",
+        "technique": "global lightening + tone"
+      },
+      "guidance": "The entire head of hair — roots, crown, temples, nape, mids, and ends — should be a uniform level 10 pale icy blonde with a cool violet-pearl tone. Zero visible root contrast. No warm or yellow patches anywhere. The hair should catch light with a clean, reflective silver-blonde quality."
+    },
+    {
+      "label": "Balayage correction — cool creamy blonde with natural root",
+      "input": {
+        "description": "Creamy, cool-toned level 8/9 lived-in blonde. Natural dark blonde root preserved.",
+        "target_level": 8,
+        "tone": "beige/ash",
+        "technique": "glaze/toning"
+      },
+      "guidance": "The root area stays at the client's natural level 6 dark blonde — do not lighten or alter the roots. The mids and ends shift from brassy gold/orange to a cool, creamy beige-ash blonde around level 8-9. The transition from root to ends should look soft and lived-in, not stripey or blocky."
+    },
+    {
+      "label": "Root retouch — bright blonde covering grey",
+      "input": {
+        "description": "Clean, bright, neutral-cool blonde at root area, blending seamlessly with existing level 10 ends.",
+        "target_level": 10,
+        "tone": "neutral/ash",
+        "technique": "root retouch (highlift)"
+      },
+      "guidance": "Only the regrowth area (first 1-3cm from the scalp) changes to a bright neutral-cool blonde that matches the existing level 10 ends. The grey hairs at the root are no longer visible. The mids and ends remain exactly as they are. There should be no visible demarcation line between the retouched roots and the existing colour."
+    }
+  ],
+  "negative": [
+    {
+      "label": "Dark roots persisted on global/all-over colour",
+      "input": {
+        "description": "Clean, icy, level 10 platinum blonde. No yellow or gold.",
+        "target_level": 10,
+        "tone": "violet/pearl",
+        "technique": "global lightening + tone"
+      },
+      "problem": "The generated image kept the client's original darker roots visible at levels 6-7, creating a shadow root / root smudge effect. The technique was 'global lightening' which means the entire head should be uniform level 10 — root to tip. The model defaulted to a fashionable ombre look instead of following the instruction.",
+      "correction": "When technique is 'global lightening' or 'all-over colour', every strand from root to tip must be the same target level and tone. The roots, crown, temples, hairline, and nape must all match the mids and ends. Zero root contrast."
+    },
+    {
+      "label": "Hairstyle changed along with colour",
+      "input": {
+        "description": "Creamy, cool-toned level 8/9 blonde.",
+        "target_level": 8,
+        "tone": "beige/ash",
+        "technique": "glaze/toning"
+      },
+      "problem": "The generated image changed the client's hair from straight to wavy, added volume, and altered the parting. The client's actual hairstyle was lost — this is not what they would look like after a colour service.",
+      "correction": "Only the colour changes. The hair's shape, parting, length, volume, curl pattern, and texture must remain identical to the input photo. A colour service does not restyle the hair."
+    },
+    {
+      "label": "Unnatural or flat colour — painted-on look",
+      "input": {
+        "description": "Clean, bright, neutral-cool blonde.",
+        "target_level": 10,
+        "tone": "neutral/ash",
+        "technique": "root retouch (highlift)"
+      },
+      "problem": "The generated image applied the new colour as a flat, uniform block with no light variation. The hair looked digitally painted — like a colour overlay — rather than real dyed hair. No natural highlights where light would hit, no subtle depth in shadow areas.",
+      "correction": "Real hair has natural light interaction even when it is a single colour. The result must show subtle brightness variation from light hitting the surface, softer tones in the underlayers, and proper shadow in areas like behind the ear and the nape. The colour must look like it belongs on real hair, not painted on."
+    },
+    {
+      "label": "Roots lightened when technique was root-preserving",
+      "input": {
+        "description": "Creamy, cool-toned level 8/9 lived-in blonde. Natural dark blonde root preserved.",
+        "target_level": 8,
+        "tone": "beige/ash",
+        "technique": "glaze/toning"
+      },
+      "problem": "The generated image lightened the client's natural level 6 root area to match the mids and ends. The technique was 'glaze/toning' which specifically preserves the natural root — demi-permanent colour cannot lift natural hair.",
+      "correction": "When the technique is glaze, toning, or balayage, the root area must stay at the client's natural level. Only the mids and ends should reflect the target colour. The whole point of these techniques is to keep a natural, lived-in root."
+    }
+  ]
+}

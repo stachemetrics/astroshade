@@ -1,0 +1,99 @@
+{
+  "positive": [
+    {
+      "label": "Virgin medium blonde — healthy",
+      "input": {
+        "stylist_notes": "",
+        "image_description": "Young woman with medium blonde hair, natural-looking, no visible regrowth or banding. Hair appears smooth and shiny throughout.",
+        "image_path": "testcases/structured/case1_start_v2.png"
+      },
+      "expected_output": {
+        "current_level": 7,
+        "description": "Medium Blonde, virgin hair, healthy condition",
+        "grey_percentage": 0,
+        "condition": "healthy",
+        "previous_colour": "none"
+      },
+      "why": "No signs of prior colour, consistent level root to tip, healthy cuticle."
+    },
+    {
+      "label": "Brassy grown-out balayage — porous ends",
+      "input": {
+        "stylist_notes": "Client says balayage was done about 6 months ago. Has been washing frequently and spending time in the sun.",
+        "image_description": "Woman with dark blonde roots and lighter mids/ends showing gold and orange tones. Ends look slightly dry and matte compared to roots.",
+        "image_path": "testcases/structured/case2_start.png"
+      },
+      "expected_output": {
+        "current_level": 6,
+        "description": "Dark Blonde roots. Grown-out balayage, mids/ends faded to uneven level 8/9 with heavy gold and slight copper (orange). Slightly porous ends.",
+        "grey_percentage": 0,
+        "condition": "slightly porous ends",
+        "previous_colour": "balayage, grown out"
+      },
+      "why": "Root level is 6. Mids/ends lifted from previous balayage have faded warm. Porosity noted on ends from prior lightening."
+    },
+    {
+      "label": "Grey blending candidate — mixed condition",
+      "input": {
+        "stylist_notes": "Regular client. Last colour was about 8 weeks ago, highlift on roots only. Wants grey covered.",
+        "image_description": "Woman with medium blonde hair showing significant grey at the temples and parting. Mids and ends are a clean level 10 blonde. Ends slightly dry.",
+        "image_path": "testcases/structured/case3_start.png"
+      },
+      "expected_output": {
+        "current_level": 7,
+        "description": "Medium Blonde with 40% scattered grey. Mids/ends previously coloured to level 10 neutral blonde. Normal at root, slightly dry on ends.",
+        "grey_percentage": 40,
+        "condition": "normal at root, slightly dry ends",
+        "previous_colour": "level 10 neutral blonde on mids/ends"
+      },
+      "why": "Root regrowth is natural level 7 with visible grey. Prior colour visible on lengths. Condition varies root vs ends."
+    }
+  ],
+  "negative": [
+    {
+      "label": "Warm blonde misread as light brown",
+      "input": {
+        "stylist_notes": "",
+        "image_description": "Woman with warm-toned blonde hair in indoor tungsten lighting. Hair has golden undertones throughout."
+      },
+      "bad_output": {
+        "current_level": 5,
+        "description": "Light brown hair, natural, healthy condition",
+        "grey_percentage": 0,
+        "condition": "healthy",
+        "previous_colour": "none"
+      },
+      "correction": "Level 5 is too dark. Warm blonde with gold undertones in tungsten lighting is still level 7, not light brown. The gold tone is an undertone, not an indicator of a lower level. Account for warm indoor lighting shifting perception darker."
+    },
+    {
+      "label": "Grey percentage underestimated",
+      "input": {
+        "stylist_notes": "Client mentions greys coming through at the roots.",
+        "image_description": "Woman with blonde hair, grey visible at temples and through the parting line. Some scattered grey strands visible when hair is parted."
+      },
+      "bad_output": {
+        "current_level": 7,
+        "description": "Medium Blonde with minimal grey at temples",
+        "grey_percentage": 10,
+        "condition": "healthy",
+        "previous_colour": "none"
+      },
+      "correction": "Grey at temples AND scattered through the parting typically indicates 30-40%, not 10%. Grey blends with blonde and is easy to undercount in photos. When grey is visible at both the hairline and parting, always estimate higher. A 10% call would lead to a formulation that skips grey coverage entirely."
+    },
+    {
+      "label": "Porosity missed on previously coloured ends",
+      "input": {
+        "stylist_notes": "Has had balayage before.",
+        "image_description": "Woman with dark roots and lighter ends. Ends look matte and slightly frizzy compared to smooth roots."
+      },
+      "bad_output": {
+        "current_level": 6,
+        "description": "Dark Blonde with lighter balayage ends, good overall condition",
+        "grey_percentage": 0,
+        "condition": "healthy",
+        "previous_colour": "balayage"
+      },
+      "correction": "Matte, frizzy ends on previously lightened hair indicate porosity. Reporting 'healthy' when ends are visibly porous leads to over-processing during toning — porous hair grabs colour faster and darker. Condition should note 'slightly porous ends' or 'porous ends' so the formulation accounts for it (shorter processing time, careful monitoring)."
+    }
+  ]
+}

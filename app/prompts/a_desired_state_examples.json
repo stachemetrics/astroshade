@@ -1,0 +1,91 @@
+{
+  "positive": [
+    {
+      "label": "Scandi Blonde — image + text",
+      "input": {
+        "client_notes": "I want to be super bright blonde all over, like an icy Scandi blonde. I hate seeing any yellow or gold.",
+        "has_image": true,
+        "image_path": "testcases/structured/case1_desired.png"
+      },
+      "expected_output": {
+        "target_level": 10,
+        "tone": "violet/pearl",
+        "technique": "global lightening + tone",
+        "description": "Clean, icy, level 10 platinum blonde. Cool, reflective finish with violet to neutralise yellow. No warmth."
+      },
+      "why": "Client says 'all over' = global, 'icy' + 'no yellow' = violet/pearl neutralisation needed. Level 10 is the only level that matches 'super bright blonde'."
+    },
+    {
+      "label": "Brassy Balayage Correction — text only",
+      "input": {
+        "client_notes": "My balayage has gone super brassy and orange from the sun and washing. I want it cooler, creamy, and expensive-looking, but I don't want to lose my natural root.",
+        "has_image": false
+      },
+      "expected_output": {
+        "target_level": 9,
+        "tone": "smoky beige/ash",
+        "technique": "glaze/toning only",
+        "description": "Creamy, cool-toned level 8-9 lived-in blonde. Neutralise orange and gold brassiness while preserving natural root shadow."
+      },
+      "why": "Client wants to keep existing root and correct brassiness — this is toning, not lifting. 'Creamy' and 'cool' point to smoky beige/ash. 'Expensive-looking' = even, neutralised tone."
+    },
+    {
+      "label": "Grey Blending Highlift — text only",
+      "input": {
+        "client_notes": "I need my roots done. I want to stay really bright blonde, cover these greys coming through, but I don't want bleach on my scalp. Keep it as cool as possible.",
+        "has_image": false
+      },
+      "expected_output": {
+        "target_level": 10,
+        "tone": "natural ash",
+        "technique": "highlift root retouch",
+        "description": "Clean, bright, neutral-cool blonde at the root area, blending grey coverage seamlessly with existing level 10 ends. No bleach on scalp."
+      },
+      "why": "'No bleach on scalp' + grey coverage + bright blonde = highlift is the technique. 'Cool as possible' = ash. Grey blending requires a natural base for opacity, so natural ash is correct."
+    }
+  ],
+  "negative": [
+    {
+      "label": "Confusing balayage correction with balayage",
+      "input": {
+        "client_notes": "My balayage has gone super brassy and orange. I want it cooler and creamy.",
+        "has_image": false
+      },
+      "bad_output": {
+        "target_level": 9,
+        "tone": "beige/gold",
+        "technique": "balayage",
+        "description": "Fresh balayage with beige blonde tones."
+      },
+      "correction": "Technique is wrong: client already has a balayage that needs correcting, not a new balayage. Correct technique is 'glaze/toning only'. Tone is also wrong: 'beige/gold' still contains warmth — client explicitly wants cooler. Should be 'smoky beige/ash'."
+    },
+    {
+      "label": "Wrong level for icy platinum",
+      "input": {
+        "client_notes": "I want to be super bright blonde all over, like an icy Scandi blonde.",
+        "has_image": true
+      },
+      "bad_output": {
+        "target_level": 8,
+        "tone": "ash",
+        "technique": "global lightening + tone",
+        "description": "Light ash blonde all over."
+      },
+      "correction": "Level 8 is too low for 'icy Scandi blonde' — that is a level 10 result. At level 8, underlying pigment is yellow and the result would look warm, not icy. Tone should be 'violet/pearl' not just 'ash' — violet is needed specifically to neutralise the pale yellow at level 10."
+    },
+    {
+      "label": "Suggesting lightening when client wants toning only",
+      "input": {
+        "client_notes": "My hair has gone brassy, I just want it toned back to cool blonde. Keep my natural root.",
+        "has_image": false
+      },
+      "bad_output": {
+        "target_level": 10,
+        "tone": "pearl",
+        "technique": "global lightening + tone",
+        "description": "Lift to level 10 and tone with pearl."
+      },
+      "correction": "Client wants to preserve their root and correct brassiness — this is a toning-only job, not a lift. 'Global lightening' would blow out the natural root the client wants to keep. Correct technique is 'glaze/toning only'."
+    }
+  ]
+}
