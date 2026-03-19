@@ -3,3 +3,4 @@
 local/
 todo*.md
 .claude/
+*/__pycache__/
