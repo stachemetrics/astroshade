@@ -1,0 +1,5 @@
+.venv/
+.env
+local/
+todo.md
+.claude/
