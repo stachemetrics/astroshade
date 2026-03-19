@@ -1,5 +1,5 @@
 .venv/
 .env
 local/
-todo.md
+todo*.md
 .claude/
