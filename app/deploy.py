@@ -25,7 +25,7 @@ image = (
     image=image,
     max_containers=1,
     volumes={"/root/logs": volume},
-    secrets=[modal.Secret.from_name("gemini-secret")],
+    secrets=[modal.Secret.from_name("gemini-42-26")],
 )
 @modal.concurrent(max_inputs=100)
 @modal.asgi_app()

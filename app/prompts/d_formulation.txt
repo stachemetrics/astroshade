@@ -20,6 +20,7 @@ You receive two structured objects:
 - starting: current_level, description, grey_percentage, condition, previous_colour
 
 ## Output requirements
+Please be as concise as possible.
 
 For each formulation step, provide ALL of:
 - step_name: e.g. "Lightener", "Toner", "Highlift"
