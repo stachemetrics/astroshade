@@ -6,6 +6,8 @@ This is a partner project with Matt Smith. The name is inspired by the Jetsons a
 
 [Prototype #3 of 42](https://mmetrics.ai) — mmetrics.ai
 
+[Link to deployed app](https://geoffpidcock--astroshade-web-dev.modal.run/)
+
 ## The Hypothesis
 
 Can foundation models reason about hair colour formulation — specifically **Goldwell** product lines — accurately enough that a professional colourist would trust the output mid-consultation?
@@ -41,13 +43,12 @@ astroshade/
 ├── notebooks/                   # Jupyter notebooks (validation, not deployed)
 │   ├── 00_setup.ipynb           # API readiness
 │   ├── 01_testcases_*.ipynb     # Formulation test cases
-│   └── 02_user_journey.ipynb    # Step-by-step flow validation
+│   └── 02_user_journey_*.ipynb  # Step-by-step flow validation
 │
 ├── testcases/                   # Matt's test data (not deployed)
 │   └── structured/              # JSON + images per case
 │
 ├── agents.md                    # Full project context and handover doc
-├── todo.md                      # Build plan and progress
 └── .env                         # GEMINI_API_KEY (gitignored)
 ```
 
